@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>VibeAtelier | Zen Sanat Alanı</title>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;500&family=Zen+Old+Mincho&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --paper: #fdfaf5;
+            --ink: #4a4a4a;
+            --accent: #d9e4f7;
+        }
+
+        body {
+            background: #f0ece2;
+            font-family: 'Quicksand', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            min-height: 100vh;
+            color: var(--ink);
+        }
+
+        .stats {
+            margin-top: 20px;
+            font-size: 0.9rem;
+            letter-spacing: 2px;
+            color: #8a8a8a;
+        }
+
+        #canvas-container {
+            position: relative;
+            margin-top: 30px;
+            background: var(--paper);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.08);
+            border-radius: 2px;
+            padding: 20px;
+        }
+
+        canvas {
+            border: 1px dashed #e0dcd0;
+            cursor: url('https://img.icons8.com/ios-filled/20/000000/fountain-pen-tip.png'), auto;
+        }
+
+        .ui-panel {
+            margin-top: 30px;
+            text-align: center;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-bottom: 1px solid #d1ccc0;
+            background: transparent;
+            font-family: 'Zen Old Mincho', serif;
+            font-size: 1.2rem;
+            text-align: center;
+            outline: none;
+            margin-bottom: 20px;
+        }
+
+        .action-btns {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        button {
+            padding: 12px 25px;
+            border-radius: 30px;
+            border: 1px solid #d1ccc0;
+            background: white;
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+        }
+
+        button:hover {
+            background: var(--accent);
+            border-color: var(--accent);
+        }
+
+        #feedback-area {
+            margin-top: 40px;
+            max-width: 500px;
+            text-align: center;
+            animation: fadeIn 1s ease;
+        }
+
+        .resonance-msg {
+            font-style: italic;
+            font-size: 1.1rem;
+            color: #6a7a8a;
+            line-height: 1.6;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
+</head>
+<body>
+
+    <div class="stats">YANKI PUANI: <span id="score">0</span></div>
+
+    <div id="canvas-container">
+        <canvas id="paintCanvas" width="450" height="300"></canvas>
+    </div>
+
+    <div class="ui-panel">
+        <input type="text" id="mottoInput" placeholder="Buraya kalbinden geçen bir kelime bırak...">
+        <div class="action-btns">
+            <button onclick="clearCanvas()">Tuvalleri Temizle</button>
+            <button onclick="shareArt()" style="background: var(--accent);">Evrene Gönder</button>
+        </div>
+    </div>
+
+    <div id="feedback-area"></div>
+
+    <script>
+        const canvas = document.getElementById('paintCanvas');
+        const ctx = canvas.getContext('2d');
+        let painting = false;
+        let resonanceScore = 0;
+
+        // Çizim Başlatma
+        canvas.addEventListener('mousedown', () => painting = true);
+        canvas.addEventListener('mouseup', () => { painting = false; ctx.beginPath(); });
+        canvas.addEventListener('mousemove', draw);
+
+        function draw(e) {
+            if (!painting) return;
+            const rect = canvas.getBoundingClientRect();
+            ctx.lineWidth = 1.5;
+            ctx.lineCap = 'round';
+            ctx.strokeStyle = '#4a4a4a';
+            ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+        }
+
+        function clearCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            document.getElementById('feedback-area').innerHTML = "";
+        }
+
+        function shareArt() {
+            const motto = document.getElementById('mottoInput').value;
+            const feedbackArea = document.getElementById('feedback-area');
+            
+            // Teşvik edici "Ruhlar" ve yorumları
+            const souls = [
+                { name: "Dingin Bir Gözlemci", msg: `"${motto}" ifadesi, seçtiğin çizgilerle birleşince ruhumda bir huzur penceresi açtı.` },
+                { name: "Hayalperest Gezgin", msg: `Bu eser bana uzak diyarları ve henüz söylenmemiş şarkıları anımsattı. Çok zarif.` },
+                { name: "Minimalist Ruh", msg: `Karmaşanın içindeki o tek kelime... Sadeliğin gücünü ne kadar güzel yansıtmışsın.` }
+            ];
+
+            const soul = souls[Math.floor(Math.random() * souls.length)];
+            
+            // Puan Artışı
+            resonanceScore += 50 + (motto.length * 5);
+            document.getElementById('score').innerText = resonanceScore;
+
+            // Geri bildirim tasarımı
+            feedbackArea.innerHTML = `
+                <div class="resonance-msg">
+                    <strong>${soul.name} diyor ki:</strong><br>
+                    "${soul.msg}"
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>
