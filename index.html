@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>VibeAtelier | Kelimeden Sanata</title>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;500&family=Zen+Old+Mincho&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --paper: #fdfaf5;
+            --ink: #4a4a4a;
+            --accent: #d9e4f7;
+            --locked: #d1d1d1;
+        }
+
+        body {
+            background: #f0ece2;
+            font-family: 'Quicksand', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            min-height: 100vh;
+            color: var(--ink);
+            transition: all 0.5s ease;
+        }
+
+        .stats {
+            margin-top: 20px;
+            font-size: 0.9rem;
+            letter-spacing: 2px;
+            background: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        #canvas-container {
+            position: relative;
+            margin-top: 30px;
+            background: var(--paper);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.08);
+            border-radius: 2px;
+            padding: 20px;
+            display: none; /* Başlangıçta gizli */
+            animation: fadeIn 1s forwards;
+        }
+
+        canvas { border: 1px dashed #e0dcd0; cursor: crosshair; }
+
+        .ui-panel {
+            margin-top: 30px;
+            text-align: center;
+            width: 100%;
+            max-width: 450px;
+        }
+
+        input[type="text"] {
+            width: 90%;
+            padding: 15px;
+            border: none;
+            border-bottom: 2px solid #d1ccc0;
+            background: transparent;
+            font-family: 'Zen Old Mincho', serif;
+            font-size: 1.3rem;
+            text-align: center;
+            outline: none;
+            margin-bottom: 20px;
+            transition: border-color 0.3s;
+        }
+
+        .action-btns { display: flex; gap: 15px; justify-content: center; }
+
+        button {
+            padding: 12px 25px;
+            border-radius: 30px;
+            border: 1px solid #d1ccc0;
+            background: white;
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 0.8rem;
+        }
+
+        button:hover { background: var(--accent); }
+
+        /* Renk Paleti (Başlangıçta Gizli) */
+        #color-palette {
+            display: none;
+            margin-bottom: 15px;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .color-dot {
+            width: 25px; height: 25px; border-radius: 50%;
+            cursor: pointer; border: 2px solid white;
+        }
+
+        #feedback-area {
+            margin-top: 40px;
+            max-width: 500px;
+            text-align: center;
+        }
+
+        .milestone-msg {
+            color: #8b7d6b;
+            font-size: 0.8rem;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+    <div class="stats">YANKI PUANI: <span id="score">0</span></div>
+
+    <div id="canvas-container">
+        <div id="color-palette">
+            <div class="color-dot" style="background: #4a4a4a;" onclick="changeColor('#4a4a4a')"></div>
+            <div class="color-dot" style="background: #f7d9d9;" onclick="changeColor('#f7d9d9')"></div>
+            <div class="color-dot" style="background: #d9e4f7;" onclick="changeColor('#d9e4f7')"></div>
+            <div class="color-dot" style="background: #d9f7ed;" onclick="changeColor('#d9f7ed')"></div>
+        </div>
+        <canvas id="paintCanvas" width="450" height="250"></canvas>
+    </div>
+
+    <div class="ui-panel">
+        <div id="milestone-hint" class="milestone-msg">Mürekkep ve tuval için 200 puan topla...</div>
+        <input type="text" id="mottoInput" placeholder="Kelimenin enerjisini evrene bırak...">
+        <div class="action-btns">
+            <button id="clearBtn" onclick="clearCanvas()" style="display: none;">Tuvalleri Temizle</button>
+            <button onclick="sendToUniverse()" style="background: var(--accent);">Evrene Gönder</button>
+        </div>
+    </div>
+
+    <div id="feedback-area"></div>
+
+    <script>
+        const canvas = document.getElementById('paintCanvas');
+        const ctx = canvas.getContext('2d');
+        let painting = false;
+        let resonanceScore = 0;
+        let currentColor = '#4a4a4a';
+
+        // Kilitler
+        let canvasUnlocked = false;
+        let colorsUnlocked = false;
+
+        function sendToUniverse() {
+            const motto = document.getElementById('mottoInput').value;
+            if (!motto) return;
+
+            // Puanı artır
+            resonanceScore += 40 + (motto.length * 2);
+            document.getElementById('score').innerText = resonanceScore;
+
+            // Geri Bildirim Oluştur
+            generateFeedback(motto);
+
+            // Kilit Kontrolleri
+            checkMilestones();
+            
+            // Girişi temizle
+            document.getElementById('mottoInput').value = "";
+        }
+
+        function checkMilestones() {
+            if (resonanceScore >= 200 && !canvasUnlocked) {
+                canvasUnlocked = true;
+                document.getElementById('canvas-container').style.display = 'block';
+                document.getElementById('clearBtn').style.display = 'inline-block';
+                document.getElementById('milestone-hint').innerText = "Tuval açıldı! Renkler için 500 puan...";
+            }
+            if (resonanceScore >= 500 && !colorsUnlocked) {
+                colorsUnlocked = true;
+                document.getElementById('color-palette').style.display = 'flex';
+                document.getElementById('milestone-hint').innerText = "Tüm temel araçlar açıldı. Yaratmaya devam et.";
+            }
+        }
+
+        function generateFeedback(motto) {
+            const feedbacks = [
+                "Bu kelime evrende yumuşak bir dalgalanma yarattı.",
+                "Seçtiğin harfler sanki havada asılı kalıyor, çok huzurlu.",
+                "Bu düşüncenin bir rengi olsaydı, kesinlikle çok sakinleştirici olurdu.",
+                "Evren bu mesajı aldı ve bir yıldız gibi parlatıyor."
+            ];
+            const randomMsg = feedbacks[Math.floor(Math.random() * feedbacks.length)];
+            document.getElementById('feedback-area').innerHTML = 
+                `<p style="font-style: italic; animation: fadeIn 0.5s;">"${randomMsg}"</p>`;
+        }
+
+        // Çizim İşlemleri
+        canvas.addEventListener('mousedown', () => painting = true);
+        canvas.addEventListener('mouseup', () => { painting = false; ctx.beginPath(); });
+        canvas.addEventListener('mousemove', draw);
+
+        function draw(e) {
+            if (!painting) return;
+            const rect = canvas.getBoundingClientRect();
+            ctx.lineWidth = 2;
+            ctx.lineCap = 'round';
+            ctx.strokeStyle = currentColor;
+            ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+        }
+
+        function changeColor(clr) { currentColor = clr; }
+        function clearCanvas() { ctx.clearRect(0, 0, canvas.width, canvas.height); }
+    </script>
+</body>
+</html>
