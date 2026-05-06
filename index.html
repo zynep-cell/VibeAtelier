@@ -2,32 +2,39 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>VibeAtelier | Grand Evolution</title>
+    <title>VibeAtelier | Zen Room Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;500&family=Zen+Old+Mincho&display=swap" rel="stylesheet">
     <style>
-        :root { --paper: #fdfaf5; --ink: #4a4a4a; --gold: #d4af37; --accent: #d9e4f7; --pet-bg: #fffcf0; }
+        :root { --paper: #fdfaf5; --ink: #4a4a4a; --gold: #d4af37; --accent: #d9e4f7; --room-bg: #fffcf0; }
         body { background: #f0ece2; font-family: 'Quicksand', sans-serif; display: flex; flex-direction: column; align-items: center; margin: 0; min-height: 100vh; color: var(--ink); overflow-x: hidden; }
         
-        /* Header & Pet UI */
-        .header-main { display: flex; width: 95%; max-width: 1100px; justify-content: space-between; align-items: center; margin: 15px; gap: 10px; }
-        .stats-group { display: flex; flex-direction: column; gap: 10px; }
-        .pill { background: white; padding: 10px 20px; border-radius: 30px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); font-weight: bold; cursor: pointer; text-align: center; }
+        /* Header UI */
+        .header-main { display: flex; width: 95%; max-width: 1100px; justify-content: space-between; align-items: flex-start; margin: 15px; gap: 20px; }
+        .stats-column { display: flex; flex-direction: column; gap: 10px; }
+        .pill { background: white; padding: 10px 20px; border-radius: 30px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); font-weight: bold; cursor: pointer; text-align: center; font-size: 14px; }
         
-        #pet-display { background: var(--pet-bg); padding: 15px; border-radius: 25px; box-shadow: 0 8px 20px rgba(0,0,0,0.05); text-align: center; width: 180px; border: 2px solid #f9f0d1; position: relative; }
-        #pet-emoji { font-size: 55px; display: block; cursor: pointer; transition: transform 0.2s; }
-        #pet-accessories { position: absolute; top: 20px; left: 50%; transform: translateX(-50%); font-size: 25px; pointer-events: none; }
-        .energy-bar { width: 100%; height: 8px; background: #e0e0e0; border-radius: 4px; margin-top: 8px; overflow: hidden; }
+        /* Buddy'nin Odası (The Zen Room) */
+        #buddy-room { background: var(--room-bg); padding: 20px; border-radius: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); width: 300px; min-height: 220px; border: 3px solid #f9f0d1; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        
+        #buddy-character { font-size: 65px; cursor: pointer; transition: transform 0.2s; z-index: 10; position: relative; }
+        #buddy-outfit { position: absolute; top: -10px; font-size: 35px; z-index: 11; pointer-events: none; }
+        
+        /* Eşya Rafları (Açılan eşyalar burada görünür) */
+        #item-shelf { position: absolute; bottom: 10px; width: 90%; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; border-top: 1px solid #eee; padding-top: 10px; min-height: 40px; }
+        .room-item { cursor: pointer; font-size: 22px; transition: transform 0.2s; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.1)); }
+        .room-item:hover { transform: scale(1.2); }
+
+        .energy-bar { width: 120px; height: 8px; background: #e0e0e0; border-radius: 4px; margin-top: 10px; overflow: hidden; }
         .energy-fill { height: 100%; background: #ffadad; width: 100%; transition: width 0.3s; }
 
         /* Atölye Paneli */
-        #atelier-main { display: none; background: var(--paper); box-shadow: 0 15px 50px rgba(0,0,0,0.1); padding: 15px; border-radius: 12px; width: 90%; max-width: 800px; }
+        #atelier-main { display: none; background: var(--paper); box-shadow: 0 15px 50px rgba(0,0,0,0.1); padding: 15px; border-radius: 12px; width: 90%; max-width: 850px; margin-top: 15px; }
         .toolbar { display: flex; gap: 8px; padding: 10px; border-bottom: 1px solid #eee; flex-wrap: wrap; justify-content: center; }
         canvas { background: white; border: 1px solid #eee; cursor: crosshair; width: 100%; border-radius: 8px; margin-top: 10px; }
 
         /* Mağaza & Overlay */
-        .overlay { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 30px; border-radius: 25px; box-shadow: 0 0 150px rgba(0,0,0,0.4); z-index: 2000; width: 380px; max-height: 80vh; overflow-y: auto; }
-        .shop-section { margin-bottom: 20px; border-bottom: 2px solid #f0ece2; padding-bottom: 10px; }
-        .unlock-item { display: flex; justify-content: space-between; padding: 8px; font-size: 0.85rem; }
+        .overlay { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 30px; border-radius: 25px; box-shadow: 0 0 150px rgba(0,0,0,0.4); z-index: 2000; width: 400px; max-height: 80vh; overflow-y: auto; }
+        .unlock-item { display: flex; justify-content: space-between; padding: 8px; font-size: 0.85rem; border-bottom: 1px solid #f0ece2; }
 
         button { padding: 8px 14px; border-radius: 18px; border: 1px solid #ddd; background: white; cursor: pointer; font-size: 11px; transition: 0.2s; }
         button.active { background: var(--accent); border-color: #6a7a8a; }
@@ -39,16 +46,19 @@
 <body>
 
     <div class="header-main">
-        <div class="stats-group">
+        <div class="stats-column">
             <div class="pill">✨ <span id="score">0</span> Yankı</div>
-            <div class="pill" style="color: var(--gold);" onclick="toggleOverlay()">🏪 Gelişim & Buddy Mağazası</div>
+            <div class="pill" style="color: var(--gold);" onclick="toggleOverlay()">🏪 Gelişim Mağazası</div>
         </div>
 
-        <div id="pet-display">
-            <div id="pet-accessories"></div>
-            <span id="pet-emoji" onclick="petBuddy()">🐣</span>
-            <div id="pet-name" style="font-size: 14px; font-weight: bold; margin-top: 5px; color: #8b7d6b;">VibeBuddy</div>
+        <div id="buddy-room">
+            <div id="buddy-outfit"></div>
+            <span id="buddy-character" onclick="petBuddy()">🐣</span>
+            <div id="buddy-name-label" style="font-size: 14px; font-weight: bold; margin-top: 5px; color: #8b7d6b;">VibeBuddy</div>
             <div class="energy-bar"><div id="energy-fill" class="energy-fill"></div></div>
+            
+            <!-- Buddy'nin kazandığı eşyalar burada sergilenecek -->
+            <div id="item-shelf"></div>
         </div>
     </div>
 
@@ -61,30 +71,20 @@
             <button onclick="undo()">↩ Geri</button>
             <button onclick="setMode('eraser')">🧽 Silgi</button>
         </div>
-        <canvas id="canvas" width="800" height="450"></canvas>
+        <canvas id="canvas" width="850" height="450"></canvas>
     </div>
 
-    <div class="ui-panel" style="text-align: center; margin-top: 20px;">
-        <input type="text" id="nameInput" placeholder="Buddy'ye isim ver..." onchange="updateBuddyName(this.value)" style="padding: 10px; border-radius: 20px; border: 1px solid #ddd; outline: none; margin-bottom: 10px;"><br>
-        <input type="text" id="mottoInput" style="width: 380px; padding: 15px; border: none; border-bottom: 2px solid #d1ccc0; background: transparent; font-family: 'Zen Old Mincho', serif; font-size: 1.2rem; outline: none;" placeholder="İçinden geçen güzellikleri paylaş...">
+    <div class="ui-panel" style="text-align: center; margin-top: 15px;">
+        <input type="text" id="nameInput" placeholder="Dostunun ismini yaz..." onchange="updateBuddyName(this.value)" style="padding: 10px; border-radius: 20px; border: 1px solid #ddd; outline: none; margin-bottom: 10px;"><br>
+        <input type="text" id="mottoInput" style="width: 380px; padding: 15px; border: none; border-bottom: 2px solid #d1ccc0; background: transparent; font-family: 'Zen Old Mincho', serif; font-size: 1.2rem; outline: none;" placeholder="İçinden geçen güzellikleri evrene bırak...">
         <button onclick="sendToUniverse()" style="padding: 12px 35px; border-radius: 40px; border: none; background: var(--accent); cursor: pointer; font-weight: bold; font-size: 1rem;">Evrene Gönder</button>
-        <p id="next-unlock" style="font-size: 12px; color: #8b7d6b; margin-top: 15px; font-style: italic;"></p>
+        <p id="next-info" style="font-size: 12px; color: #8b7d6b; margin-top: 10px; font-style: italic;"></p>
     </div>
 
     <div id="overlay" class="overlay">
-        <h2 style="font-family:'Zen Old Mincho'; text-align:center;">Büyük Evrim Mağazası</h2>
-        
-        <div class="shop-section">
-            <h4>🎨 Atölye Gelişimi (20 Seviye)</h4>
-            <div id="atelier-locks"></div>
-        </div>
-
-        <div class="shop-section">
-            <h4>🧸 Buddy'nin Dünyası (20 Seviye)</h4>
-            <div id="buddy-locks"></div>
-        </div>
-
-        <button onclick="toggleOverlay()" style="width:100%; padding:15px; background:#f0f0f0; border:none; border-radius:15px;">Kapat</button>
+        <h2 style="font-family:'Zen Old Mincho'; text-align:center;">Mağaza & Seviyeler</h2>
+        <div id="shop-content"></div>
+        <button onclick="toggleOverlay()" style="width:100%; padding:15px; background:#f0f0f0; border:none; border-radius:15px; cursor:pointer;">Kapat</button>
     </div>
 
     <div id="feed"></div>
@@ -93,87 +93,83 @@
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
         let score = 0, petEnergy = 100, painting = false, currentMode = 'brush', currentColor = '#4a4a4a', currentSize = 5;
-        let history = [], buddyName = "VibeBuddy";
+        let history = [], buddyName = "VibeBuddy", activeOutfit = "";
 
-        // --- 20 SEVİYE ATÖLYE SİSTEMİ ---
+        // --- 40 SEVİYE SİSTEMİ (BOZULMADAN) ---
         const atelierLevels = [
-            { pts: 100, id: 'canvas', name: "Atölye Kapısı", type: 'sys' },
-            { pts: 200, id: 'watercolor', name: "Sulu Boya", label: "🎨 Sulu Boya" },
-            { pts: 300, id: 'spray', name: "Püskürtme", label: "💨 Püskürtme" },
-            { pts: 400, id: 'heart', name: "Aşk Damgası", label: "❤ Kalp" },
-            { pts: 550, id: 'star', name: "Yıldız Tozu", label: "⭐ Yıldız" },
-            { pts: 700, id: 'glitter', name: "Simli Altın", label: "✨ Simli Altın" },
-            { pts: 850, id: 'circle', name: "Daire Formu", label: "⭕ Daire" },
-            { pts: 1000, id: 'square', name: "Kare Formu", label: "⬛ Kare" },
-            { pts: 1150, id: 'flower', name: "Bahar Dalı", label: "🌸 Çiçek" },
-            { pts: 1300, id: 'leaf', name: "Doğa Ruhu", label: "🌿 Yaprak" },
-            { pts: 1450, id: 'deco', name: "Zen Motif", label: "💠 Desen" },
-            { pts: 1600, id: 'moon', name: "Gece Işığı", label: "🌙 Ay" },
-            { pts: 1800, id: 'sun', name: "Güneş Gücü", label: "☀️ Güneş" },
-            { pts: 2000, id: 'cloud', name: "Bulut Krallığı", label: "☁️ Bulut" },
-            { pts: 2200, id: 'sparkle', name: "Işıltı", label: "❇️ Işıltı" },
-            { pts: 2400, id: 'butterfly', name: "Kelebek", label: "🦋 Kelebek" },
-            { pts: 2650, id: 'rainbow', name: "Gökkuşağı", label: "🌈 Renk" },
-            { pts: 2900, id: 'music', name: "Melodi", label: "🎵 Nota" },
-            { pts: 3200, id: 'fire', name: "Ateş Ruhu", label: "🔥 Ateş" },
-            { pts: 3500, id: 'infinity', name: "Sonsuzluk", label: "♾ Sonsuz" }
+            { pts: 100, id: 'canvas', name: "Atölye Kapısı" },
+            { pts: 200, id: 'watercolor', label: "🎨 Sulu Boya" },
+            { pts: 300, id: 'spray', label: "💨 Püskürtme" },
+            { pts: 400, id: 'heart', label: "❤ Kalp" },
+            { pts: 550, id: 'star', label: "⭐ Yıldız" },
+            { pts: 700, id: 'glitter', label: "✨ Simli Altın" },
+            { pts: 850, id: 'circle', label: "⭕ Daire" },
+            { pts: 1000, id: 'square', label: "⬛ Kare" },
+            { pts: 1150, id: 'flower', label: "🌸 Çiçek" },
+            { pts: 1300, id: 'leaf', label: "🌿 Yaprak" },
+            { pts: 1450, id: 'deco', label: "💠 Desen" },
+            { pts: 1600, id: 'moon', label: "🌙 Ay" },
+            { pts: 1800, id: 'sun', label: "☀️ Güneş" },
+            { pts: 2000, id: 'cloud', label: "☁️ Bulut" },
+            { pts: 2200, id: 'sparkle', label: "❇️ Işıltı" },
+            { pts: 2400, id: 'butterfly', label: "🦋 Kelebek" },
+            { pts: 2650, id: 'rainbow', label: "🌈 Renk" },
+            { pts: 2900, id: 'music', label: "🎵 Nota" },
+            { pts: 3200, id: 'fire', label: "🔥 Ateş" },
+            { pts: 3500, id: 'infinity', label: "♾ Sonsuz" }
         ];
 
-        // --- 20 SEVİYE BUDDY SİSTEMİ ---
         const buddyLevels = [
-            { pts: 150, id: 'b_ball', name: "Mavi Top", obj: "⚽" },
+            { pts: 150, id: 'b_ball', name: "Mavi Top", icon: "⚽" },
             { pts: 250, id: 'b_evolve1', name: "Büyüme: Civciv", emoji: "🐥" },
-            { pts: 350, id: 'b_hat', name: "Mavi Şapka", acc: "🧢" },
-            { pts: 450, id: 'b_treat', name: "Lezzetli Kurabiye", obj: "🍪" },
-            { pts: 600, id: 'b_glasses', name: "Güneş Gözlüğü", acc: "🕶️" },
+            { pts: 350, id: 'b_hat', name: "Mavi Şapka", icon: "🧢", type: 'outfit' },
+            { pts: 450, id: 'b_treat', name: "Kurabiye", icon: "🍪" },
+            { pts: 600, id: 'b_glasses', name: "Gözlük", icon: "🕶️", type: 'outfit' },
             { pts: 750, id: 'b_evolve2', name: "Büyüme: Kuş", emoji: "🐦" },
-            { pts: 950, id: 'b_scarf', name: "Sıcak Atkı", acc: "🧣" },
-            { pts: 1100, id: 'b_toy', name: "Oyuncak Ayı", obj: "🧸" },
-            { pts: 1250, id: 'b_crown', name: "Altın Taç", acc: "👑" },
+            { pts: 950, id: 'b_scarf', name: "Sıcak Atkı", icon: "🧣", type: 'outfit' },
+            { pts: 1100, id: 'b_toy', name: "Ayıcık", icon: "🧸" },
+            { pts: 1250, id: 'b_crown', name: "Altın Taç", icon: "👑", type: 'outfit' },
             { pts: 1400, id: 'b_evolve3', name: "Büyüme: Baykuş", emoji: "🦉" },
-            { pts: 1550, id: 'b_wand', name: "Sihirli Değnek", obj: "🪄" },
-            { pts: 1700, id: 'b_ribbon', name: "Kırmızı Kurdele", acc: "🎀" },
+            { pts: 1550, id: 'b_wand', name: "Sihirli Değnek", icon: "🪄" },
+            { pts: 1700, id: 'b_ribbon', name: "Kurdele", icon: "🎀", type: 'outfit' },
             { pts: 1900, id: 'b_evolve4', name: "Büyüme: Tavuskuşu", emoji: "🦚" },
-            { pts: 2100, id: 'b_cape', name: "Süper Kahraman Pelerini", acc: "🦸" },
-            { pts: 2300, id: 'b_camera', name: "Eski Kamera", obj: "📷" },
+            { pts: 2100, id: 'b_cape', name: "Pelerin", icon: "🦸", type: 'outfit' },
+            { pts: 2300, id: 'b_camera', name: "Kamera", icon: "📷" },
             { pts: 2550, id: 'b_evolve5', name: "Büyüme: Phoenix", emoji: "🦜" },
-            { pts: 2800, id: 'b_diamond', name: "Elmas Kolye", acc: "💎" },
-            { pts: 3100, id: 'b_music', name: "Radyo", obj: "📻" },
+            { pts: 2800, id: 'b_diamond', name: "Kolye", icon: "💎", type: 'outfit' },
+            { pts: 3100, id: 'b_radio', name: "Radyo", icon: "📻" },
             { pts: 3400, id: 'b_evolveFinal', name: "Final: Ejderha", emoji: "🐲" },
-            { pts: 4000, id: 'b_throne', name: "Efsanevi Taht", acc: "🏰" }
+            { pts: 4000, id: 'b_throne', name: "Taht", icon: "🏰" }
         ];
 
         function sendToUniverse() {
             const val = document.getElementById('mottoInput').value;
             if(!val) return;
-            score += 90 + (val.length * 3);
-            petEnergy = Math.min(100, petEnergy + 20);
+            score += 95 + (val.length * 2);
+            petEnergy = Math.min(100, petEnergy + 15);
             document.getElementById('score').innerText = score;
-            updateBuddyUI();
             checkAllUnlocks();
             addToFeed(val);
             document.getElementById('mottoInput').value = "";
         }
 
         function checkAllUnlocks() {
-            // Atölye
             atelierLevels.forEach(l => {
                 if(score >= l.pts) {
                     if(l.id === 'canvas') document.getElementById('atelier-main').style.display = 'block';
                     else if(l.label) addToolBtn(l);
                 }
             });
-            // Buddy
+
             buddyLevels.forEach(l => {
                 if(score >= l.pts) {
-                    if(l.emoji) document.getElementById('pet-emoji').innerText = l.emoji;
-                    if(l.acc) document.getElementById('pet-accessories').innerText = l.acc;
+                    if(l.emoji) document.getElementById('buddy-character').innerText = l.emoji;
+                    if(l.icon) addRoomItem(l);
                 }
             });
 
-            const nextA = atelierLevels.find(l => score < l.pts);
-            const nextB = buddyLevels.find(l => score < l.pts);
-            document.getElementById('next-unlock').innerText = `Sıradaki Keşif: ${nextA ? nextA.name : 'Tamamlandı'} & ${nextB ? nextB.name : 'Tamamlandı'}`;
+            let nextA = atelierLevels.find(l => score < l.pts);
+            document.getElementById('next-info').innerText = nextA ? `Sonraki Keşif: ${nextA.label || nextA.name} (${nextA.pts} Pts)` : "Ustalık Seviyesine Erişildi!";
         }
 
         function addToolBtn(l) {
@@ -185,6 +181,29 @@
             }
         }
 
+        // Buddy Odasına Eşya Ekleme
+        function addRoomItem(l) {
+            if(!document.getElementById('room-'+l.id)) {
+                const span = document.createElement('span');
+                span.id = 'room-'+l.id;
+                span.className = 'room-item';
+                span.innerText = l.icon;
+                span.title = l.name;
+                span.onclick = () => {
+                    if(l.type === 'outfit') {
+                        // Eğer zaten giyiliyorsa çıkar, değilse giy
+                        const outfitDiv = document.getElementById('buddy-outfit');
+                        if(outfitDiv.innerText === l.icon) outfitDiv.innerText = "";
+                        else outfitDiv.innerText = l.icon;
+                    } else {
+                        // Oyuncaklara tıklayınca Buddy tepki verir
+                        petBuddy();
+                    }
+                };
+                document.getElementById('item-shelf').appendChild(span);
+            }
+        }
+
         function setMode(m) { 
             currentMode = m; 
             if(m === 'glitter') currentColor = '#d4af37';
@@ -192,7 +211,7 @@
             document.getElementById('btn-'+m)?.classList.add('active');
         }
 
-        // --- GELİŞMİŞ ÇİZİM & GLITTER ---
+        // --- ÇİZİM MOTORU ---
         canvas.addEventListener('mousedown', (e) => { saveState(); painting = true; draw(e); });
         canvas.addEventListener('mousemove', draw);
         canvas.addEventListener('mouseup', () => { painting = false; ctx.beginPath(); });
@@ -209,7 +228,6 @@
                 ctx.strokeStyle = currentMode === 'eraser' ? '#ffffff' : (currentMode === 'glitter' ? '#d4af37' : currentColor);
                 ctx.globalAlpha = currentMode === 'watercolor' ? 0.2 : 1;
                 ctx.lineTo(x, y); ctx.stroke();
-                
                 if(currentMode === 'glitter') {
                     for(let i=0; i<8; i++) {
                         ctx.fillStyle = Math.random() > 0.5 ? '#fff' : '#ffd700';
@@ -219,7 +237,7 @@
                 }
             } else if(currentMode === 'spray') {
                 ctx.fillStyle = currentColor;
-                for(let i=0; i<30; i++) ctx.fillRect(x + Math.random()*currentSize*2.5-currentSize, y + Math.random()*currentSize*2.5-currentSize, 1, 1);
+                for(let i=0; i<30; i++) ctx.fillRect(x + Math.random()*currentSize*2-currentSize, y + Math.random()*currentSize*2-currentSize, 1, 1);
             } else {
                 const icons = {heart:'❤', star:'⭐', circle:'⭕', square:'⬛', flower:'🌸', leaf:'🌿', deco:'💠', moon:'🌙', sun:'☀️', cloud:'☁️', sparkle:'❇️', butterfly:'🦋', rainbow:'🌈', music:'🎵', fire:'🔥', infinity:'♾'};
                 ctx.font = `${currentSize * 2.5}px serif`;
@@ -232,48 +250,49 @@
         }
 
         function petBuddy() {
-            petEnergy = Math.min(100, petEnergy + 2);
-            document.getElementById('pet-emoji').style.transform = "scale(1.4) rotate(8deg)";
-            setTimeout(() => document.getElementById('pet-emoji').style.transform = "scale(1)", 200);
+            petEnergy = Math.min(100, petEnergy + 3);
+            document.getElementById('buddy-character').style.transform = "scale(1.3) translateY(-10px)";
+            setTimeout(() => document.getElementById('buddy-character').style.transform = "scale(1)", 200);
             
-            const talks = ["Gıdıklandım!", "Senin ellerin çok sıcak.", "Bunu bekliyordum!", "Harika hissettiriyor.", "İyi ki varsın!"];
-            const msg = talks[Math.floor(Math.random()*talks.length)];
-            
+            const talks = ["Bu harika!", "Kendimi çok şanslı hissediyorum.", "Odama bayılıyorum!", "Seninle yaratmak çok keyifli.", "Gıdıklandım!"];
             const div = document.createElement('div');
             div.className = 'feed-item';
-            div.innerHTML = `<span style="color:#e67e22; font-weight:bold;">${buddyName}:</span> "${msg}"`;
+            div.innerHTML = `<span style="color:#e67e22; font-weight:bold;">${buddyName}:</span> "${talks[Math.floor(Math.random()*talks.length)]}"`;
             document.getElementById('feed').appendChild(div);
-            updateBuddyUI();
+            updatePetUI();
         }
 
         function addToFeed(t) {
             const feed = document.getElementById('feed');
-            const talks = [`${buddyName} bu sözlerini kalbine yazdı.`, `${buddyName} seninle gurur duyuyor!`, "Evren bu enerjiyi çok sevdi.", "Ne kadar zarif bir düşünce."];
+            const talks = [`${buddyName} bu sözleri odasına astı.`, "Dostun bu enerjiyle parlıyor!", "Pozitif yankı evrene yayıldı."];
             const div = document.createElement('div');
             div.className = 'feed-item';
             div.innerHTML = `<strong>"${t}"</strong><br><small>✨ ${talks[Math.floor(Math.random()*talks.length)]}</small>`;
             feed.appendChild(div);
+            updatePetUI();
         }
 
-        function updateBuddyUI() {
+        function updatePetUI() {
             document.getElementById('energy-fill').style.width = petEnergy + "%";
-            document.getElementById('pet-emoji').style.filter = petEnergy < 30 ? "grayscale(100%)" : "none";
+            document.getElementById('buddy-character').style.filter = petEnergy < 30 ? "grayscale(100%)" : "none";
         }
 
-        function updateBuddyName(n) { buddyName = n || "VibeBuddy"; document.getElementById('pet-name').innerText = buddyName; }
+        function updateBuddyName(n) { buddyName = n || "VibeBuddy"; document.getElementById('buddy-name-label').innerText = buddyName; }
 
         function toggleOverlay() {
             const o = document.getElementById('overlay');
             o.style.display = o.style.display === 'block' ? 'none' : 'block';
-            
-            document.getElementById('atelier-locks').innerHTML = atelierLevels.map(l => `<div class="unlock-item" style="color:${score >= l.pts ? '#2ecc71':'#999'}"><span>${score >= l.pts ? '✅':'🔒'} ${l.name}</span><span>${l.pts} Pts</span></div>`).join('');
-            document.getElementById('buddy-locks').innerHTML = buddyLevels.map(l => `<div class="unlock-item" style="color:${score >= l.pts ? '#2ecc71':'#999'}"><span>${score >= l.pts ? '✅':'🔒'} ${l.name}</span><span>${l.pts} Pts</span></div>`).join('');
+            let html = "<h4>🎨 Atölye</h4>";
+            html += atelierLevels.map(l => `<div class="unlock-item" style="color:${score >= l.pts ? '#2ecc71':'#999'}"><span>${score >= l.pts ? '✅':'🔒'} ${l.label || l.name}</span><span>${l.pts} Pts</span></div>`).join('');
+            html += "<h4 style='margin-top:20px;'>🧸 Buddy</h4>";
+            html += buddyLevels.map(l => `<div class="unlock-item" style="color:${score >= l.pts ? '#2ecc71':'#999'}"><span>${score >= l.pts ? '✅':'🔒'} ${l.name}</span><span>${l.pts} Pts</span></div>`).join('');
+            document.getElementById('shop-content').innerHTML = html;
         }
 
         function saveState() { history.push(canvas.toDataURL()); if(history.length > 20) history.shift(); }
-        function undo() { if(history.length > 0) { let img = new Image(); img.src = history.pop(); img.onload = () => { ctx.clearRect(0,0,800,450); ctx.drawImage(img,0,0); }; } }
+        function undo() { if(history.length > 0) { let img = new Image(); img.src = history.pop(); img.onload = () => { ctx.clearRect(0,0,850,450); ctx.drawImage(img,0,0); }; } }
         
-        setInterval(() => { if(petEnergy > 0) { petEnergy -= 1; updateBuddyUI(); } }, 7000);
+        setInterval(() => { if(petEnergy > 0) { petEnergy -= 1; updatePetUI(); } }, 8000);
     </script>
 </body>
 </html>
